@@ -1,0 +1,168 @@
+{
+  "format": "gridlens",
+  "schemaVersion": "1.0.0",
+  "coordinateSpace": "canvas-px",
+  "title": "连续主景与叠格坐标示例",
+  "canvas": {
+    "width": 1280,
+    "height": 3840,
+    "backgroundColor": "#FFFFFF",
+    "clipToCanvas": true
+  },
+  "assets": [],
+  "referenceImage": null,
+  "panels": [
+    {
+      "id": "P01",
+      "type": "rect",
+      "label": "连续主景底层",
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 3840
+      },
+      "z": 10,
+      "readOrder": 1,
+      "visible": true,
+      "locked": true,
+      "style": {
+        "fill": "#D5E3F3",
+        "stroke": "#F97316",
+        "strokeWidth": 4,
+        "frameVisible": false,
+        "opacity": 1
+      },
+      "source": {
+        "method": "manual",
+        "reviewStatus": "confirmed"
+      }
+    },
+    {
+      "id": "P02",
+      "type": "rect",
+      "label": "再次指认副格",
+      "bbox": {
+        "x": 291,
+        "y": 1548,
+        "width": 951,
+        "height": 756
+      },
+      "z": 20,
+      "readOrder": 2,
+      "visible": true,
+      "locked": false,
+      "style": {
+        "fill": "#EDF4FB",
+        "stroke": "#F97316",
+        "strokeWidth": 4,
+        "frameVisible": true,
+        "opacity": 1
+      },
+      "source": {
+        "method": "manual",
+        "reviewStatus": "confirmed"
+      }
+    },
+    {
+      "id": "P03",
+      "type": "rect",
+      "label": "被点名者反应格",
+      "bbox": {
+        "x": 122,
+        "y": 2340,
+        "width": 1070,
+        "height": 833
+      },
+      "z": 30,
+      "readOrder": 3,
+      "visible": true,
+      "locked": false,
+      "style": {
+        "fill": "#EDF4FB",
+        "stroke": "#F97316",
+        "strokeWidth": 4,
+        "frameVisible": true,
+        "opacity": 1
+      },
+      "source": {
+        "method": "manual",
+        "reviewStatus": "confirmed"
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "id": "B01",
+      "type": "text",
+      "x": 418,
+      "y": 1356,
+      "text": "陆小六！",
+      "fontSize": 46,
+      "fontFamily": "Microsoft YaHei",
+      "color": "#242A33",
+      "z": 101,
+      "panelId": "P01",
+      "followPanel": true,
+      "visible": true
+    },
+    {
+      "id": "B02",
+      "type": "text",
+      "x": 306,
+      "y": 2218,
+      "text": "猴子！",
+      "fontSize": 46,
+      "fontFamily": "Microsoft YaHei",
+      "color": "#242A33",
+      "z": 102,
+      "panelId": "P02",
+      "followPanel": true,
+      "visible": true
+    },
+    {
+      "id": "B03",
+      "type": "text",
+      "x": 792,
+      "y": 3078,
+      "text": "茜姐好眼光！",
+      "fontSize": 46,
+      "fontFamily": "Microsoft YaHei",
+      "color": "#242A33",
+      "z": 103,
+      "panelId": "P03",
+      "followPanel": true,
+      "visible": true
+    },
+    {
+      "id": "D01",
+      "type": "dimension",
+      "start": {
+        "x": 291,
+        "y": 1510
+      },
+      "end": {
+        "x": 1242,
+        "y": 1510
+      },
+      "mode": "horizontal",
+      "color": "#2563EB",
+      "z": 200,
+      "panelId": "P02",
+      "followPanel": true,
+      "visible": true
+    }
+  ],
+  "guides": {
+    "gridVisible": true,
+    "gridStep": 256,
+    "gridColor": "#DD486080",
+    "snapToGrid": false,
+    "rulersVisible": true
+  },
+  "metadata": {
+    "description": "格框来自参考查看器内的新排版坐标；文本沿用台词和主体左上坐标。本示例只演示格框及文字标注，不包含原始气泡轮廓、插画或隐藏图层。",
+    "intendedUse": "schema-and-editor-example",
+    "geometryStatus": "authored-coordinate-design"
+  }
+}

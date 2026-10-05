@@ -1,0 +1,635 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gridlens:document:1.0.0",
+  "title": "GridLens 项目 JSON 规范草案 1.0.0",
+  "description": "本文件为新项目实施方案的格式草案。所有几何坐标均为画布原始像素。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "gridlens"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "coordinateSpace": {
+      "const": "canvas-px"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "canvas": {
+      "$ref": "#/$defs/canvas"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "maxItems": 1000
+    },
+    "referenceImage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/referenceImage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "panels": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/rectPanel"
+          },
+          {
+            "$ref": "#/$defs/polygonPanel"
+          }
+        ]
+      },
+      "maxItems": 10000
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/textAnnotation"
+          },
+          {
+            "$ref": "#/$defs/arrowAnnotation"
+          },
+          {
+            "$ref": "#/$defs/dimensionAnnotation"
+          }
+        ]
+      },
+      "maxItems": 10000
+    },
+    "guides": {
+      "$ref": "#/$defs/guides"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "format",
+    "schemaVersion",
+    "coordinateSpace",
+    "canvas",
+    "assets",
+    "panels",
+    "annotations"
+  ],
+  "$defs": {
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "backgroundColor": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "clipToCanvas": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "backgroundColor"
+      ]
+    },
+    "bbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "panelStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fill": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "stroke": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frameVisible": {
+          "type": "boolean",
+          "default": true
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        }
+      },
+      "required": [
+        "fill",
+        "stroke",
+        "strokeWidth"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "manual",
+            "json",
+            "opencv"
+          ]
+        },
+        "reviewStatus": {
+          "enum": [
+            "pending",
+            "confirmed",
+            "edited"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "启发式候选评分，不是校准后的正确概率。"
+        },
+        "uncertaintyPx": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "method",
+        "reviewStatus"
+      ]
+    },
+    "rectPanel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "locked": {
+          "type": "boolean",
+          "default": false
+        },
+        "z": {
+          "type": "integer"
+        },
+        "readOrder": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "style": {
+          "$ref": "#/$defs/panelStyle"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "type": {
+          "const": "rect"
+        },
+        "bbox": {
+          "$ref": "#/$defs/bbox"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "bbox",
+        "z",
+        "style"
+      ]
+    },
+    "polygonPanel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "locked": {
+          "type": "boolean",
+          "default": false
+        },
+        "z": {
+          "type": "integer"
+        },
+        "readOrder": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "style": {
+          "$ref": "#/$defs/panelStyle"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "type": {
+          "const": "polygon"
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/point"
+          },
+          "minItems": 3,
+          "maxItems": 5000
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "points",
+        "z",
+        "style"
+      ]
+    },
+    "textAnnotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "z": {
+          "type": "integer"
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "panelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "followPanel": {
+          "type": "boolean",
+          "default": false
+        },
+        "type": {
+          "const": "text"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 50000
+        },
+        "fontSize": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fontFamily": {
+          "type": "string",
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "text",
+        "fontSize",
+        "color",
+        "z"
+      ]
+    },
+    "arrowAnnotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "z": {
+          "type": "integer"
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "panelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "followPanel": {
+          "type": "boolean",
+          "default": false
+        },
+        "type": {
+          "const": "arrow"
+        },
+        "start": {
+          "$ref": "#/$defs/point"
+        },
+        "end": {
+          "$ref": "#/$defs/point"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 5000
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "start",
+        "end",
+        "strokeWidth",
+        "color",
+        "z"
+      ]
+    },
+    "dimensionAnnotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "z": {
+          "type": "integer"
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "panelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "followPanel": {
+          "type": "boolean",
+          "default": false
+        },
+        "type": {
+          "const": "dimension"
+        },
+        "start": {
+          "$ref": "#/$defs/point"
+        },
+        "end": {
+          "$ref": "#/$defs/point"
+        },
+        "mode": {
+          "enum": [
+            "horizontal",
+            "vertical",
+            "distance"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 5000
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "start",
+        "end",
+        "mode",
+        "color",
+        "z"
+      ]
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "mimeType": {
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "embedded"
+                },
+                "data": {
+                  "type": "string",
+                  "pattern": "^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$"
+                }
+              },
+              "required": [
+                "type",
+                "data"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "const": "relative-file"
+                },
+                "path": {
+                  "type": "string",
+                  "pattern": "^assets/[A-Za-z0-9_./-]+$"
+                }
+              },
+              "required": [
+                "type",
+                "path"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "mimeType",
+        "width",
+        "height",
+        "source"
+      ]
+    },
+    "referenceImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assetId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+        },
+        "bbox": {
+          "$ref": "#/$defs/bbox"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "exportable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "assetId",
+        "bbox",
+        "opacity",
+        "visible",
+        "locked",
+        "exportable"
+      ]
+    },
+    "guides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gridVisible": {
+          "type": "boolean"
+        },
+        "gridStep": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "gridColor": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|transparent)$"
+        },
+        "snapToGrid": {
+          "type": "boolean"
+        },
+        "rulersVisible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "gridVisible",
+        "gridStep",
+        "snapToGrid"
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "provenance": {
+    "skill": "UI UX Pro Max",
+    "revision": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+    "checkedOn": "2026-10-05",
+    "query": "Photo/Video Editor desktop",
+    "adopted": [
+      "Minimalism & Swiss Style",
+      "high information density",
+      "restrained motion",
+      "keyboard alternatives"
+    ],
+    "adaptations": [
+      "采用桌面编辑工作台布局；检索中的 Hero 布局不适合编辑器。",
+      "蓝色为唯一主要操作色，橙色专用于格框，紫色专用于标注。",
+      "中文使用系统字体与 Microsoft YaHei；坐标使用等宽字体。"
+    ]
+  },
+  "color": {
+    "chrome": "#0F172A",
+    "surface": "#192134",
+    "text": "#F8FAFC",
+    "mutedText": "#CBD5E1",
+    "border": "#475569",
+    "primary": "#2563EB",
+    "onPrimary": "#FFFFFF",
+    "workspace": "#E2E8F0",
+    "canvasDefault": "#FFFFFF",
+    "panel": "#F97316",
+    "annotation": "#7C3AED",
+    "measurement": "#2563EB",
+    "danger": "#B91C1C"
+  },
+  "typography": {
+    "ui": "Microsoft YaHei, Noto Sans SC, system-ui, sans-serif",
+    "coordinates": "Consolas, ui-monospace, monospace",
+    "sizes": [
+      12,
+      14,
+      16,
+      18,
+      24,
+      32
+    ]
+  },
+  "spacing": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32
+  ],
+  "radius": [
+    4,
+    8,
+    12
+  ],
+  "motion": {
+    "feedbackMs": 120,
+    "panelMs": 180,
+    "obeyReducedMotion": true
+  },
+  "layout": {
+    "header": 56,
+    "leftPanel": 240,
+    "rightPanel": 300,
+    "statusBar": 28,
+    "toolbarTarget": 40
+  }
+}
