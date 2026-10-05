@@ -1,0 +1,14 @@
+:root {
+  --chrome: #0f172a;
+  --surface: #192134;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --border: #475569;
+  --primary: #2563eb;
+  --workspace: #e2e8f0;
+  --panel: #f97316;
+  --annotation: #7c3aed;
+  --measurement: #2563eb;
+  --font-ui: "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: Consolas, ui-monospace, monospace;
+}

@@ -1,93 +1,70 @@
-# Comic Typesetting Tools
+# GridLens · Comic Typesetting Tools
 
-面向漫画和条漫排版的格框坐标工具：通过 JSON 描述格框位置，将坐标直观地展示为图，并支持后续编辑、测量、标注和图片导出。
+面向漫画和条漫的本地格框编辑器。用原始像素编辑坐标，将 GridLens JSON 绘成图；也可载入图片，识别格框候选，经人工校正后保存 JSON。
 
-**项目状态：仓库初始化。当前包含项目说明、开发方案与基础 Git 配置，功能尚未实现。**
+**当前为开发版：两条主要流程已实现并在 Linux Chromium 验证，完整首版验收尚未完成。** 真实漫画样本评估和 Windows Chrome/Edge 下载验收仍待完成，见 [API 核对记录](docs/api-verification.md) 和 [验证记录](docs/validation.md)。
 
-## 开发方案
+## 开发
 
-- [完整实施方案（HTML）](docs/development-plan/坐标编辑器实施方案.html)：技术选择、九项需求、界面草图、测量、导出、自动识别、实施阶段与验收规则。
-- [JSON Schema 草案](docs/development-plan/gridlens.schema.json)
-- [示例项目 JSON](docs/development-plan/示例项目.json)
-- [UI 设计变量](docs/development-plan/design-tokens.json)
+需要 Node.js ≥ 22.12，已验证 Node 24.19.0 / npm 11.9.0。依赖使用精确版本与 `package-lock.json` 固定。
 
-HTML 方案下载后可用浏览器打开。以上是前期方案与数据规格草案，尚未开始功能开发。
+```bash
+npm ci
+npm run dev
+```
 
-## 项目目标
+```bash
+npm run typecheck
+npm test
+npm run build
+npm run test:e2e
+```
 
-围绕两条流程开发：
+浏览器测试优先使用系统 `/usr/bin/chromium`。其他环境可设置 `CHROMIUM_PATH` 为本机 Chromium/Chrome 路径；没有系统浏览器时先执行 `npx playwright install chromium`。生产产物位于 `dist/`，可用 `npm run preview` 检查。
 
-1. **JSON → 图形**：导入已有坐标，预览格框，调整布局，导出图片或保存项目 JSON。
-2. **图片 → JSON**：自动检测图片中的格框，人工确认、修正和补画，输出可继续编辑的坐标 JSON。
+云环境中可为 npm 命令加 `--cache /tmp/gridlens-npm-cache`，避免默认缓存目录写权限问题。使用现有 checkout；每个云任务已隔离，无需额外 Git worktree。
 
-## 功能需求
+## 已实现
 
-| 功能 | 计划行为 |
-| --- | --- |
-| 画布尺寸与比例 | 自定义像素宽高；默认 1280 × 3840（1:3），提供 1:1、4:3、3:4、9:16、16:9 等预设 |
-| JSON 规范 | 明确文档版本、坐标单位、格框、标注和图片资源结构，提供 Schema、示例和校验 |
-| 格框编辑 | 拖动、缩放、复制、删除、锁定和层次调整，支持数值输入与键盘微调 |
-| 导入与导出 | 粘贴或导入 JSON；导出 PNG、JPG、SVG，并保存项目 JSON |
-| 背景设置 | 设置画布颜色与透明背景；JPG 导出时设置铺底颜色 |
-| 标注 | 文字、箭头和尺寸标注，可关联格框 |
-| 图片反向识别 | 自动产生格框候选，允许手动校正、删除与补画后输出 JSON |
-| 文档与 API 核对 | 开发时通过 Context7 核对目标库版本和当前 API，记录核对结果 |
-| UI / UX | 参考 UI UX Pro Max，采用适合编辑和测量的工作台布局 |
+- JSON Schema 2020-12 与语义校验：唯一 ID、几何、安全资源路径、关联引用和非退化多边形。失败导入保留原文档。
+- 画布尺寸、比例预设、底色与透明背景；尺寸变化可保留坐标或同步缩放对象。
+- Fabric 7 适配：矩形拖动、八方向缩放、多选、锁定、复制、删除、独立 Z / 阅读顺序；多边形顶点编辑；数值与键盘替代操作。
+- 原始像素坐标、格框边界、两点测量、两格间距/交叠、网格与吸附、标尺。
+- 文字、箭头、尺寸标注；跟随关联格框、单独移动、数值编辑；删格框可保留标注或一起删除。
+- PNG、JPG 和真实矢量 SVG 导出。倍率作用于位图，JPG 可设置铺底；辅助显示与选择手柄不导出。
+- JSON 保存、撤销重做（50 个历史快照）、IndexedDB 自动保存与显式恢复。
+- 本地 PNG/JPG/WebP 载入和 EXIF 方向归一；嵌入图片资源与相对资源重新关联。
+- 本地 OpenCV 4.12 Worker：矩形/斜格候选、近似双边框去重、长图重叠分块、取消、人工确认与修正。重复识别保留已确认/修正的格框。
+- 中文三栏工作台；375/768 宽度下通过面板切换访问项目与属性；可见焦点与减少动态效果。
 
-自动识别与人工校正属于完整首版范围。识别准确率需使用真实图片评估，不预先承诺所有图片都能准确识别。
+## 操作
 
-## 测量功能
+V 选择、R 绘制格框、M 两点测量、H 平移；Shift 点击多选。方向键移动 1 px，Shift + 方向键移动 10 px。数值输入在 Enter 或失焦时应用。
 
-参考原坐标查看器，计划提供：
+Ctrl/⌘ + Z 撤销，Shift + Ctrl/⌘ + Z 重做，Ctrl/⌘ + D 复制，Ctrl/⌘ + S 下载项目 JSON。视图缩放不改变 JSON 坐标；所有业务坐标使用左上原点。
 
-- 鼠标对应的原始画布坐标。
-- 格框的 X、Y、宽、高、右边界和下边界。
-- 两点之间的水平距离、垂直距离和直线距离。
-- 格框间距、尺寸线、网格和辅助线。
+图片处理全部发生在本机浏览器，OpenCV 与 WASM 通过工程打包，首次识别按需加载。自动保存仅保存在当前浏览器中，跨设备请下载 JSON。
 
-测量结果使用原始像素，预览缩放不改变坐标和尺寸。
+## 支持范围与限制
 
-## 数据约定
+- 画布每边为 1–32767 px，预览会限制实际 backing canvas 大小；超大图无法无限放大。
+- 位图导出每边不超过 32767 px，总面积不超过 3200 万像素。超过时降低倍率或导出 SVG。
+- 图片输入不超过 40 MB / 4000 万像素。归一后嵌入内容不超过 28 MiB；JSON 文件输入不超过 32 MiB，过大图片会明确拒绝，避免保存出无法重载的项目。
+- 相对图片资源需要重新选择本地文件关联；浏览器不能根据 JSON 中的路径任意读取文件系统。
+- 识别阈值与评分是启发式，8 px 内的近似边框可能被合并。插画、气泡、遮挡或低对比格框可能误检或漏检，必须人工审核。合成测试通过不代表真实漫画准确率达标。
+- SVG 使用系统字体，跨机器字形和文字布局可能不同。
+- 尚未实现旧查看器 JSON 的专用迁移器，仅接受当前 GridLens 1.0.0；真实样本 B05/B06/B10 未随仓库提供，尚未评测。
 
-JSON 格式拟命名为 **GridLens**，独立于绘图库内部序列化格式。Schema 与示例草案已随开发方案加入仓库，正式格式在开发阶段确认。
+## 代码结构
 
-- 原点位于画布左上角，X 向右、Y 向下，单位为原始画布像素。
-- 矩形使用 `x`、`y`、`width`、`height` 描述；几何范围不包含描边。
-- 多边形使用全局坐标顶点数组描述。
-- 图层顺序与阅读顺序分别记录。
-- 格框、标注和资源使用唯一 ID；无效尺寸、重复 ID 与缺失引用应提示错误。
-- 文档包含格式版本，后续不兼容变更通过版本迁移处理。
+`src/core` 保存引擎独立的文档、几何和命令；`src/adapters` 将原始坐标映射到 Fabric；`src/services` 负责图片、导出和存储；`src/features` / `src/workers` 负责识别；`src/styles` 定义语义设计变量。
 
-## 技术方向
+## 开发方案与依据
 
-以下是开发方案，当前尚未创建工程或安装依赖：
+- [原实施方案](docs/development-plan/坐标编辑器实施方案.html)
+- [GridLens Schema](docs/development-plan/gridlens.schema.json)、[示例项目](docs/development-plan/示例项目.json)
+- [UI/UX Pro Max 采用记录](docs/design-system.md)
+- [API 与版本核对](docs/api-verification.md)
+- [测试与待验收事项](docs/validation.md)
 
-| 模块 | 拟采用技术 |
-| --- | --- |
-| 页面与业务模型 | React、TypeScript |
-| 开发与构建 | Vite |
-| 格框编辑与绘制 | Fabric.js |
-| JSON 校验 | JSON Schema 2020-12、Ajv |
-| 图片识别 | OpenCV.js、Web Worker |
-| 质量检查 | 类型检查、几何与导入导出测试、浏览器验证 |
-
-选择 Fabric.js 是为了兼顾对象交互与后续 SVG 导出。实际依赖版本在开始开发时通过官方资料和 Context7 核对，并使用锁文件固定。
-
-## 开发顺序
-
-- [ ] **M0：工程与数据基础**——建立工程、JSON Schema、示例、业务模型和设计变量。
-- [ ] **M1：编辑、测量与导出**——完成画布设置、拖动缩放、标注测量、撤销恢复和三种图片格式导出。
-- [ ] **M2：图片反向 JSON**——接入本地图片、自动检测、候选审核和手动校正。
-- [ ] **M3：真实样本验收**——验证长图、叠格、斜格、不同倍率及 Windows 浏览器中的实际导出。
-
-目前没有启动命令；工程创建后补充安装、运行、构建和测试说明。
-
-## 参考项目
-
-- [Konva](https://konvajs.org/)：格框绘制与拖动交互。
-- [JSON Canvas Viewer](https://github.com/hesprs/json-canvas-viewer)：通过坐标 JSON 展示内容。
-- [AntV X6](https://x6.antv.antgroup.com/)：对象列表、属性编辑和 JSON 数据组织。
-- [Fabric.js](https://www.fabricjs.com/)：画布对象编辑、序列化与导出。
-- [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)：工具界面设计与交互规范。
-
-参考这些项目的能力和设计思路，构建适合漫画格框坐标处理的新项目。
+React 19.3、TypeScript 7、Vite 8、Fabric 7、Ajv 8；OpenCV 包固定 4.12 系列，匹配当前使用的 4.x API。已通过 Context7 实际查询核对关键 API，并保存库 ID 与原始响应；部分库未提供对应安装版本的精确快照，版本范围见 API 核对记录。发布包源码与已运行测试提供补充证据。
